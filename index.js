@@ -7,16 +7,17 @@ var meaning1 = document.querySelector(".meaning1");
 var meaning2 = document.querySelector(".meaning2");
 var meaning3 = document.querySelector(".meaning3");
 var meaningHeader = document.querySelector(".meaning-header");
-var synonyms = document.querySelector(".synonyms");
-var antonyms = document.querySelector(".antonyms");
+var synonyms = document.querySelector(".words");
 var partOfSpeech2 = document.querySelector(".parts-of-speech2");
-var second_meaning1 = document.querySelector(".second-meaning1");
+var second_meaning1 = document.querySelector(".second-meaning");
 var source = document.querySelector(".source");
 var titleWarning = document.querySelector(".title-warning");
 var messageWarning = document.querySelector(".message-warning");
 var resolutionWarning = document.querySelector(".resolution-warning");
-var link = document.querySelector("#link");
-btnSubmit.addEventListener("click", dictionary);
+var link = document.querySelector(".linkPota");
+var main = document.querySelector(".container");
+const hamsterLoader = document.querySelector("#hamster");
+inputWord.addEventListener("input", dictionary);
 
 function dictionary() {
   const word = inputWord.value;
@@ -25,35 +26,50 @@ function dictionary() {
     .then(data => {
       if (data.length > 0) {
         const obj = data[0];
-
+        if (inputWord.value === "" || inputWord.value === null) {
+          main.style.visibility = "hidden";
+        } else {
+          main.style.visibility = "visible";
+        }
         header.innerHTML = obj.word;
         phonetics.innerHTML = obj.phonetics[0]?.text || "";
+        meaningHeader.innerHTML = "Meaning";
         partsOfspeech.innerHTML = obj.meanings[0]?.partOfSpeech || "";
-        meaningHeader.innerHTML =
-          obj.meanings[0]?.definitions[0]?.definition || "";
-        meaningHeader.style.fontWeight = "bold";
-        meaning2.innerHTML = obj.meanings[0]?.definitions[1]?.definition || "";
-        meaning3.innerHTML = obj.meanings[0]?.definitions[2]?.definition || "";
 
-        const synonymsList = obj.meanings[0]?.synonyms || "";
-        if (synonymsList.length > 0) {
-          synonyms.innerHTML = "Synonyms: " + synonymsList.join(", ");
+        // meanings
+        meaning1.innerHTML =
+          "&#x2022;  " + obj.meanings[0]?.definitions[0]?.definition || "";
+        meaningHeader.style.fontWeight = "bold";
+        if (
+          obj.meanings[0]?.definitions[1]?.definition === null ||
+          obj.meanings[0]?.definitions[2]?.definition === undefined
+        ) {
+          meaning2.innerHTML =
+            "&#x2022;  " + (obj.meanings[1]?.definitions[0]?.definition || "");
+          meaning3.innerHTML =
+            "&#x2022;  " + (obj.meanings[1]?.definitions[1]?.definition || "");
         } else {
-          synonyms.innerHTML = "No synonyms found.";
+          meaning2.innerHTML =
+            "&#x2022;  " + (obj.meanings[0]?.definitions[1]?.definition || "");
+          meaning3.innerHTML =
+            "&#x2022;  " + (obj.meanings[0]?.definitions[2]?.definition || "");
         }
 
-        const antonymsList = obj.meanings[0]?.antonyms || "";
-        if (antonymsList.length > 0) {
-          antonyms.innerHTML = "Antonyms: " + antonymsList.join(", ");
+        // synonyms
+        const synonymsList = obj.meanings[0]?.synonyms || "";
+        if (synonymsList.length > 0) {
+          (synonyms.innerHTML = synonymsList.join(", ")) &&
+            ((synonyms.style.color = "blue"),
+            (synonyms.style.fontWeight = "bold"));
         } else {
-          antonyms.innerHTML = "No amtonyms found.";
+          synonyms.innerHTML = "No synonyms found.";
         }
 
         if (obj.meanings[1]) {
           partOfSpeech2.innerHTML = obj.meanings[1]?.partOfSpeech || "";
           partOfSpeech2.style.fontWeight = "bold";
           second_meaning1.innerHTML =
-            obj.meanings[1]?.definitions[0].definition || "";
+            "&#x2022;  " + obj.meanings[1]?.definitions[0].definition || "";
           second_meaning1.style.display = "block";
         } else {
           partOfSpeech2.innerHTML = "";
@@ -61,23 +77,18 @@ function dictionary() {
           second_meaning1.innerHTML = "";
           second_meaning1.style.display = "none";
         }
+        source.innerHTML =
+          '<span style="color: grey; margin-right: 1rem;">Source </span><span style="color: red;">' +
+          obj.sourceUrls +
+          "</span>";
 
-        source.innerHTML = obj.sourceUrls;
-        link.style.display = "block";
-
-        source.style.textDecoration = "underline";
-        source.style.cursor = "pointer";
-
+        source.style.color = "red";
         titleWarning.innerHTML = "";
         messageWarning.innerHTML = "";
         resolutionWarning.innerHTML = "";
       } else {
+        errorMessage();
         resetElements();
-        titleWarning.innerHTML = "No Definitions Found";
-        messageWarning.innerHTML =
-          "Sorry pal, we couldn't find definitions for the word you were looking for.";
-        resolutionWarning.innerHTML =
-          "You can try the search again at later time or head to the web instead.";
       }
     })
     .catch(error => {
@@ -94,7 +105,6 @@ function resetElements() {
     meaning3,
     meaningHeader,
     synonyms,
-    antonyms,
     partOfSpeech2,
     second_meaning1,
     source,
@@ -104,4 +114,24 @@ function resetElements() {
   elementsToReset.forEach(element => {
     element.innerHTML = "";
   });
+}
+
+inputWord.addEventListener("keyup", function (event) {
+  if (inputWord.value === "" || inputWord.value === null) {
+    main.style.visibility = "hidden";
+    hamsterLoader.style.visibility = "visible";
+  } else {
+    main.style.visibility = "visible";
+
+    hamsterLoader.style.visibility = "hidden";
+  }
+});
+
+function errorMessage() {
+  main.style.visibility = "hidden";
+  titleWarning.innerHTML = "No Definitions Found";
+  messageWarning.innerHTML =
+    "Sorry pal, we couldn't find definitions for the word you were looking for.";
+  resolutionWarning.innerHTML =
+    "You can try the search again at later time or head to the web instead.";
 }
