@@ -96,6 +96,12 @@ main .book {
   display: flex;
 }
 
+.title-warning,
+.message-warning,
+.resolution-warning {
+  margin-block-end: 1rem;
+  text-align: center;
+}
 /* loaders */
 .wheel-and-hamster {
   --dur: 1s;
