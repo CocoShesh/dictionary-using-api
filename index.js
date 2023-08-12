@@ -17,7 +17,15 @@ var resolutionWarning = document.querySelector(".resolution-warning");
 var link = document.querySelector(".linkPota");
 var main = document.querySelector(".container");
 const hamsterLoader = document.querySelector("#hamster");
-inputWord.addEventListener("input", dictionary);
+const sound = document.querySelector(".toggleSwitch");
+
+inputWord.addEventListener("input", handleInputDelay);
+
+function handleInputDelay() {
+  setTimeout(() => {
+    dictionary();
+  }, 300);
+}
 
 function dictionary() {
   const word = inputWord.value;
@@ -31,6 +39,7 @@ function dictionary() {
         } else {
           main.style.visibility = "visible";
         }
+
         header.innerHTML = obj.word;
         phonetics.innerHTML = obj.phonetics[0]?.text || "";
         meaningHeader.innerHTML = "Meaning";
@@ -135,3 +144,30 @@ function errorMessage() {
   resolutionWarning.innerHTML =
     "You can try the search again at later time or head to the web instead.";
 }
+
+function soundClick() {
+  var soundPlayer = document.getElementById("sound");
+  var sourceElement = soundPlayer.querySelector("source");
+
+  sourceElement.src = `https://api.dictionaryapi.dev/media/pronunciations/en/${inputWord.value}-us.mp3`;
+  soundPlayer.load();
+  soundPlayer.play();
+}
+sound.addEventListener("click", soundClick);
+
+const body = document.querySelector("body");
+const toggleMode = document.querySelector(".toggle-mode");
+
+toggleMode.addEventListener("click", function () {
+  if (body.classList.contains("dark-mode")) {
+    body.classList.remove("dark-mode");
+    toggleMode.style.left = "";
+    toggleMode.style.backgroundColor = "white";
+    body.style.color = "black";
+  } else {
+    body.classList.add("dark-mode");
+    toggleMode.style.left = "30px";
+    toggleMode.style.backgroundColor = "black";
+    body.style.color = "#e1e1e1";
+  }
+});
